@@ -1,11 +1,13 @@
-name: 'Your name here'
+name: 'kimromi/protect-issues'
 description: 'Provide a description here'
 author: 'Your name or organization here'
 inputs:
-  milliseconds: # change this
+  github_token:
+    description: 'GitHub token'
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  protected_users:
+    description: 'Set GitHub username that does not delete the issues'
+    required: true
 runs:
   using: 'node16'
   main: 'dist/index.js'

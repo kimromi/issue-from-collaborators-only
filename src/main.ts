@@ -1,19 +1,50 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import * as github from '@actions/github'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const {
+      payload: {sender, issue, comment},
+      eventName
+    } = github.context
+    const token = core.getInput('github_token')
+    const {graphql} = github.getOctokit(token)
+    const protectedUsers = core.getMultilineInput('protected_users')
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const user: string | undefined = sender?.login
+    if (!user || protectedUsers.includes(user)) return
 
-    core.setOutput('time', new Date().toTimeString())
+    if (eventName === 'issues' && issue) {
+      await graphql(DeleteIssueMutation, {issueId: issue.node_id})
+      core.debug('issue deleted.')
+      return
+    }
+
+    if (eventName === 'issue_comment' && comment) {
+      await graphql(DeleteIssueCommentMutation, {commentId: comment.node_id})
+      core.debug('issue comment deleted.')
+      return
+    }
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
 }
 
 run()
+
+// see: https://docs.github.com/ja/graphql/reference/mutations#deleteissue
+const DeleteIssueMutation = `
+  mutation DeleteIssue($issueId: ID!) {
+    deleteIssue(input: {issueId: $issueId}) {
+      clientMutationId
+    }
+  }
+`
+// see: https://docs.github.com/ja/graphql/reference/mutations#deleteissuecomment
+const DeleteIssueCommentMutation = `
+  mutation DeleteIssueComment($commentId: ID!) {
+    deleteIssueComment(input: {id: $commentId}) {
+      clientMutationId
+    }
+  }
+`
