@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+import {DeleteIssueCommentMutation, DeleteIssueMutation} from './graphql'
 
 async function run(): Promise<void> {
   try {
@@ -31,20 +32,3 @@ async function run(): Promise<void> {
 }
 
 run()
-
-// see: https://docs.github.com/ja/graphql/reference/mutations#deleteissue
-const DeleteIssueMutation = `
-  mutation DeleteIssue($issueId: ID!) {
-    deleteIssue(input: {issueId: $issueId}) {
-      clientMutationId
-    }
-  }
-`
-// see: https://docs.github.com/ja/graphql/reference/mutations#deleteissuecomment
-const DeleteIssueCommentMutation = `
-  mutation DeleteIssueComment($commentId: ID!) {
-    deleteIssueComment(input: {id: $commentId}) {
-      clientMutationId
-    }
-  }
-`

@@ -1,6 +1,33 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 5157:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DeleteIssueCommentMutation = exports.DeleteIssueMutation = void 0;
+// see: https://docs.github.com/ja/graphql/reference/mutations#deleteissue
+exports.DeleteIssueMutation = `
+  mutation DeleteIssue($issueId: ID!) {
+    deleteIssue(input: {issueId: $issueId}) {
+      clientMutationId
+    }
+  }
+`;
+// see: https://docs.github.com/ja/graphql/reference/mutations#deleteissuecomment
+exports.DeleteIssueCommentMutation = `
+  mutation DeleteIssueComment($commentId: ID!) {
+    deleteIssueComment(input: {id: $commentId}) {
+      clientMutationId
+    }
+  }
+`;
+
+
+/***/ }),
+
 /***/ 3109:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -37,6 +64,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
+const graphql_1 = __nccwpck_require__(5157);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -48,12 +76,12 @@ function run() {
             if (!user || protectedUsers.includes(user))
                 return;
             if (eventName === 'issues' && issue) {
-                yield graphql(DeleteIssueMutation, { issueId: issue.node_id });
+                yield graphql(graphql_1.DeleteIssueMutation, { issueId: issue.node_id });
                 core.debug('issue deleted.');
                 return;
             }
             if (eventName === 'issue_comment' && comment) {
-                yield graphql(DeleteIssueCommentMutation, { commentId: comment.node_id });
+                yield graphql(graphql_1.DeleteIssueCommentMutation, { commentId: comment.node_id });
                 core.debug('issue comment deleted.');
                 return;
             }
@@ -65,22 +93,6 @@ function run() {
     });
 }
 run();
-// see: https://docs.github.com/ja/graphql/reference/mutations#deleteissue
-const DeleteIssueMutation = `
-  mutation DeleteIssue($issueId: ID!) {
-    deleteIssue(input: {issueId: $issueId}) {
-      clientMutationId
-    }
-  }
-`;
-// see: https://docs.github.com/ja/graphql/reference/mutations#deleteissuecomment
-const DeleteIssueCommentMutation = `
-  mutation DeleteIssueComment($commentId: ID!) {
-    deleteIssueComment(input: {id: $commentId}) {
-      clientMutationId
-    }
-  }
-`;
 
 
 /***/ }),
