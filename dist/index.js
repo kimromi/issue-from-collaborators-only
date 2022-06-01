@@ -68,21 +68,24 @@ const graphql_1 = __nccwpck_require__(5157);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const { payload: { sender, issue, comment }, eventName } = github.context;
+            const { repo: { owner, repo }, payload: { sender, issue, comment }, eventName } = github.context;
             const token = core.getInput('github_token');
-            const { graphql } = github.getOctokit(token);
-            const protectedUsers = core.getMultilineInput('protected_users');
+            const { rest, graphql } = github.getOctokit(token);
+            const { data } = yield rest.repos.listCollaborators({ owner, repo });
+            const collaborators = data.map(({ login }) => login);
             const user = sender === null || sender === void 0 ? void 0 : sender.login;
-            if (!user || protectedUsers.includes(user))
+            if (!user || collaborators.includes(user)) {
+                core.info('issue protected.');
                 return;
+            }
             if (eventName === 'issues' && issue) {
                 yield graphql(graphql_1.DeleteIssueMutation, { issueId: issue.node_id });
-                core.debug('issue deleted.');
+                core.info('issue deleted.');
                 return;
             }
             if (eventName === 'issue_comment' && comment) {
                 yield graphql(graphql_1.DeleteIssueCommentMutation, { commentId: comment.node_id });
-                core.debug('issue comment deleted.');
+                core.info('issue comment deleted.');
                 return;
             }
         }

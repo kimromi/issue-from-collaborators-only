@@ -5,25 +5,31 @@ import {DeleteIssueCommentMutation, DeleteIssueMutation} from './graphql'
 async function run(): Promise<void> {
   try {
     const {
+      repo: {owner, repo},
       payload: {sender, issue, comment},
       eventName
     } = github.context
     const token = core.getInput('github_token')
-    const {graphql} = github.getOctokit(token)
-    const protectedUsers = core.getMultilineInput('protected_users')
+    const {rest, graphql} = github.getOctokit(token)
+
+    const {data} = await rest.repos.listCollaborators({owner, repo})
+    const collaborators = data.map(({login}) => login)
 
     const user: string | undefined = sender?.login
-    if (!user || protectedUsers.includes(user)) return
+    if (!user || collaborators.includes(user)) {
+      core.info('issue protected.')
+      return
+    }
 
     if (eventName === 'issues' && issue) {
       await graphql(DeleteIssueMutation, {issueId: issue.node_id})
-      core.debug('issue deleted.')
+      core.info('issue deleted.')
       return
     }
 
     if (eventName === 'issue_comment' && comment) {
       await graphql(DeleteIssueCommentMutation, {commentId: comment.node_id})
-      core.debug('issue comment deleted.')
+      core.info('issue comment deleted.')
       return
     }
   } catch (error) {
