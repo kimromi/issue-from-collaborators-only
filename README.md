@@ -1,4 +1,6 @@
-GitHub Actions to delete issues and issue comments other than the collaborators
+# kimromi/issue-from-collaborators-only
+
+GitHub Actions to delete issues and issue comments other than the repository collaborators.
 
 ```yaml
 name: Protect issues and comments
@@ -13,7 +15,7 @@ jobs:
   protect-issues:
     runs-on: ubuntu-latest
     steps:
-      - uses: kimromi/protect-issues@main
+      - uses: kimromi/issue-from-collaborators-only@main
         with:
           github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 ```

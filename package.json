@@ -1,9 +1,9 @@
 {
-  "name": "protect-issues",
+  "name": "issue-from-collaborators-only",
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kimromi/protect-issues.git"
+    "url": "git+https://github.com/kimromi/issue-from-collaborators-only.git"
   },
   "author": "kimromi",
   "license": "MIT",
