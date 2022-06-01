@@ -1,4 +1,4 @@
-GitHub Actions to delete issues and issue comments other than the specified user
+GitHub Actions to delete issues and issue comments other than the collaborators
 
 ```yaml
 name: Protect issues and comments
@@ -16,5 +16,4 @@ jobs:
       - uses: kimromi/protect-issues@main
         with:
           github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          protected_users: "kimromi1\nkimromi2"
 ```
